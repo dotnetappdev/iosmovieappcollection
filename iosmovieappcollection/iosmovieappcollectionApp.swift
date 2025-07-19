@@ -2,7 +2,7 @@
 //  iosmovieappcollectionApp.swift
 //  iosmovieappcollection
 //
-//  Created by david on 19/07/2025.
+//  Enhanced with Movie model and dependencies
 //
 
 import SwiftUI
@@ -12,7 +12,7 @@ import SwiftData
 struct iosmovieappcollectionApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Movie.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
