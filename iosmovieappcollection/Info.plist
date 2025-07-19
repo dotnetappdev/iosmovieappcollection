@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Camera Usage Description -->
+	<key>NSCameraUsageDescription</key>
+	<string>This app uses the camera to scan DVD barcodes and automatically identify movies for your collection.</string>
+	
+	<!-- Photo Library Add Usage Description -->
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This app can save movie poster images to your photo library in custom albums (Movies Collected and Movies Wanted).</string>
+	
+	<!-- Photo Library Usage Description (for older iOS versions) -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app can save movie poster images to your photo library in custom albums (Movies Collected and Movies Wanted).</string>
+	
+	<!-- App Transport Security -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>omdbapi.com</key>
+			<dict>
+				<key>NSExceptionRequiresForwardSecrecy</key>
+				<false/>
+				<key>NSExceptionMinimumTLSVersion</key>
+				<string>TLSv1.0</string>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+			<key>www.omdbapi.com</key>
+			<dict>
+				<key>NSExceptionRequiresForwardSecrecy</key>
+				<false/>
+				<key>NSExceptionMinimumTLSVersion</key>
+				<string>TLSv1.0</string>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
+	
+	<!-- App Configuration -->
+	<key>CFBundleDisplayName</key>
+	<string>Movie Collection</string>
+	
+	<key>CFBundleShortVersionString</key>
+	<string>1.0.0</string>
+	
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	
+	<!-- Supported Interface Orientations -->
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
+	
+	<!-- Required Device Capabilities -->
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+		<string>camera-flash</string>
+		<string>auto-focus-camera</string>
+	</array>
+	
+	<!-- Status Bar Style -->
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleDefault</string>
+	
+	<!-- Launch Screen -->
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>AccentColor</string>
+		<key>UIImageName</key>
+		<string>LaunchImage</string>
+	</dict>
+	
+	<!-- Background Modes (if needed for processing) -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>background-processing</string>
+	</array>
+	
+	<!-- App Category -->
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.entertainment</string>
+	
+</dict>
+</plist>

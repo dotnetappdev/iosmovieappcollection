@@ -11,6 +11,8 @@ import SwiftData
 @main
 struct iosmovieappcollectionApp: App {
     @StateObject private var appSettings = AppSettings()
+    @StateObject private var permissionsService = PermissionsService()
+    @State private var showingPermissions = false
     
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
@@ -28,9 +30,33 @@ struct iosmovieappcollectionApp: App {
 
     var body: some Scene {
         WindowGroup {
-            MainTabView()
+            if showingPermissions {
+                PermissionsView {
+                    showingPermissions = false
+                }
                 .environmentObject(appSettings)
+                .environmentObject(permissionsService)
+            } else {
+                MainTabView()
+                    .environmentObject(appSettings)
+                    .environmentObject(permissionsService)
+                    .onAppear {
+                        checkPermissions()
+                    }
+            }
         }
         .modelContainer(sharedModelContainer)
+    }
+    
+    private func checkPermissions() {
+        permissionsService.updatePermissionStatuses()
+        
+        // Show permissions screen on first launch or if camera permission is denied
+        let hasShownPermissions = UserDefaults.standard.bool(forKey: "hasShownPermissions")
+        
+        if !hasShownPermissions || permissionsService.cameraPermissionStatus == .denied {
+            showingPermissions = true
+            UserDefaults.standard.set(true, forKey: "hasShownPermissions")
+        }
     }
 }

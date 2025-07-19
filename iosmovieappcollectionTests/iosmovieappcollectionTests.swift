@@ -6,6 +6,8 @@
 //
 
 import Testing
+import AVFoundation
+import Photos
 @testable import iosmovieappcollection
 
 struct iosmovieappcollectionTests {
@@ -73,6 +75,160 @@ struct iosmovieappcollectionTests {
         settings.imdbAPIKey = "testkey123"
         #expect(settings.hasValidAPIKey == true)
         #expect(settings.isAPIConfigured == true)
+    }
+    
+    @Test func testIMDBResponseParsing() async throws {
+        // Test IMDB API response parsing
+        let sampleJSON = """
+        {
+            "Title": "The Matrix",
+            "Year": "1999",
+            "Genre": "Action, Sci-Fi",
+            "Director": "Lana Wachowski, Lilly Wachowski",
+            "Plot": "A computer programmer is led to fight an underground war.",
+            "Response": "True",
+            "imdbID": "tt0133093"
+        }
+        """.data(using: .utf8)!
+        
+        let response = try JSONDecoder().decode(IMDBResponse.self, from: sampleJSON)
+        
+        #expect(response.title == "The Matrix")
+        #expect(response.year == "1999")
+        #expect(response.genre == "Action, Sci-Fi")
+        #expect(response.director == "Lana Wachowski, Lilly Wachowski")
+        #expect(response.response == "True")
+        #expect(response.imdbID == "tt0133093")
+    }
+    
+    @Test func testMovieFromIMDBResponse() async throws {
+        // Test creating a movie from IMDB response
+        let response = IMDBResponse(
+            title: "Test Movie",
+            year: "2023",
+            rated: "PG-13",
+            released: "01 Jan 2023",
+            runtime: "120 min",
+            genre: "Action",
+            director: "Test Director",
+            writer: "Test Writer",
+            actors: "Test Actor 1, Test Actor 2",
+            plot: "A test movie plot",
+            language: "English",
+            country: "USA",
+            awards: "N/A",
+            poster: "http://example.com/poster.jpg",
+            imdbID: "tt1234567",
+            imdbRating: "8.5",
+            response: "True",
+            error: nil
+        )
+        
+        let imdbService = IMDBService()
+        let movie = imdbService.createMovieFromIMDBResponse(response)
+        
+        #expect(movie.title == "Test Movie")
+        #expect(movie.year == 2023)
+        #expect(movie.genre == "Action")
+        #expect(movie.director == "Test Director")
+        #expect(movie.plot == "A test movie plot")
+        #expect(movie.imdbID == "tt1234567")
+        #expect(movie.posterURL == "http://example.com/poster.jpg")
+        #expect(movie.runtime == "120 min")
+        #expect(movie.actors == "Test Actor 1, Test Actor 2")
+        #expect(movie.language == "English")
+        #expect(movie.country == "USA")
+    }
+    
+    @Test func testPermissionsService() async throws {
+        // Test permissions service initialization
+        let permissionsService = PermissionsService()
+        
+        // Should initialize with current system status
+        #expect(permissionsService.cameraPermissionStatus == AVCaptureDevice.authorizationStatus(for: .video))
+        #expect(permissionsService.photoLibraryPermissionStatus == PHPhotoLibrary.authorizationStatus(for: .addOnly))
+        
+        // Test permission descriptions
+        let cameraDescription = permissionsService.cameraPermissionDescription
+        let photoDescription = permissionsService.photoLibraryPermissionDescription
+        
+        #expect(!cameraDescription.isEmpty)
+        #expect(!photoDescription.isEmpty)
+    }
+    
+    @Test func testImageCacheService() async throws {
+        // Test image cache service
+        let imageCache = ImageCacheService()
+        
+        // Test cache size calculation
+        let cacheSize = imageCache.getCacheSize()
+        #expect(!cacheSize.isEmpty)
+        #expect(cacheSize.contains("MB"))
+        
+        // Test cache operations with sample data
+        let sampleData = "test image data".data(using: .utf8)!
+        let testURL = "http://example.com/test.jpg"
+        
+        // Cache the data
+        imageCache.cacheImage(data: sampleData, for: testURL)
+        
+        // Retrieve from cache
+        let cachedData = imageCache.getCachedImage(for: testURL)
+        #expect(cachedData == sampleData)
+        
+        // Clear cache
+        imageCache.clearCache()
+        let clearedData = imageCache.getCachedImage(for: testURL)
+        #expect(clearedData == nil)
+    }
+    
+    @Test func testMovieDisplayProperties() async throws {
+        // Test movie computed properties
+        let movieWithData = Movie(
+            title: "Complete Movie",
+            year: 2023,
+            genre: "Action",
+            userRating: 8
+        )
+        
+        #expect(movieWithData.displayYear == "2023")
+        #expect(movieWithData.displayGenre == "Action")
+        #expect(movieWithData.displayRating == "8/10")
+        #expect(movieWithData.hasLocalPoster == false)
+        
+        let movieWithoutData = Movie(title: "Incomplete Movie")
+        
+        #expect(movieWithoutData.displayYear == "Unknown")
+        #expect(movieWithoutData.displayGenre == "Unknown")
+        #expect(movieWithoutData.displayRating == "Not Rated")
+        
+        // Test with poster data
+        let posterData = "poster".data(using: .utf8)!
+        movieWithData.posterImageData = posterData
+        #expect(movieWithData.hasLocalPoster == true)
+    }
+    
+    @Test func testAppSettingsValidation() async throws {
+        // Test app settings validation
+        let settings = AppSettings()
+        
+        // Initially not configured
+        #expect(settings.isAPIConfigured == false)
+        #expect(settings.hasValidAPIKey == false)
+        
+        // Set short API key
+        settings.imdbAPIKey = "short"
+        #expect(settings.hasValidAPIKey == false)
+        
+        // Set valid API key
+        settings.imdbAPIKey = "validapikey123"
+        #expect(settings.hasValidAPIKey == true)
+        #expect(settings.isAPIConfigured == true)
+        
+        // Test reset
+        settings.resetToDefaults()
+        #expect(settings.imdbAPIKey.isEmpty)
+        #expect(settings.isAPIConfigured == false)
     }
 
 }
