@@ -10,9 +10,12 @@ import SwiftData
 
 @main
 struct iosmovieappcollectionApp: App {
+    @StateObject private var appSettings = AppSettings()
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Movie.self,
+            Collection.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -25,7 +28,8 @@ struct iosmovieappcollectionApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabView()
+                .environmentObject(appSettings)
         }
         .modelContainer(sharedModelContainer)
     }
